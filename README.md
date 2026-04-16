@@ -1,49 +1,52 @@
-####################################################################
-# CS:APP Proxy Lab
+##########################################################################
+# CS:APP 프록시 실습
 #
-# Student Source Files
-####################################################################
+# 학생용 소스 파일
+###########################################################################
 
-This directory contains the files you will need for the CS:APP Proxy
-Lab.
+이 디렉터리에는 CS:APP 프록시 실습에 필요한 파일이 포함되어 있습니다.
 
 proxy.c
+
 csapp.h
 csapp.c
-    These are starter files.  csapp.c and csapp.h are described in
-    your textbook. 
 
-    You may make any changes you like to these files.  And you may
-    create and handin any additional files you like.
+이 파일들은 시작 파일입니다. csapp.c와 csapp.h에 대한 설명은
+교재에 나와 있습니다.
 
-    Please use `port-for-user.pl' or 'free-port.sh' to generate
-    unique ports for your proxy or tiny server. 
+이 파일들을 자유롭게 수정할 수 있습니다. 또한,
+원하는 추가 파일을 만들어 제출할 수도 있습니다.
+
+`port-for-user.pl` 또는 `free-port.sh`를 사용하여 프록시 또는 타이니 서버에 사용할 고유한 포트를 생성하세요.
 
 Makefile
-    This is the makefile that builds the proxy program.  Type "make"
-    to build your solution, or "make clean" followed by "make" for a
-    fresh build. 
+이 파일은 프록시 프로그램을 빌드하는 Makefile입니다. "make"를 입력하여 솔루션을 빌드하거나, "make clean"을 입력한 후 "make"를 입력하여 새로 빌드하세요.
 
-    Type "make handin" to create the tarfile that you will be handing
-    in. You can modify it any way you like. Your instructor will use your
-    Makefile to build your proxy from source.
+
+"make handin"을 입력하여 제출할 tar 파일을 생성하세요.
+이 파일은 자유롭게 수정할 수 있습니다. 담당 교수는 여러분의 Makefile을 사용하여 소스 코드에서 프록시를 빌드합니다.
 
 port-for-user.pl
-    Generates a random port for a particular user
-    usage: ./port-for-user.pl <userID>
+
+특정 사용자에 대한 임의의 포트를 생성합니다.
+
+사용법: ./port-for-user.pl <사용자 ID>
 
 free-port.sh
-    Handy script that identifies an unused TCP port that you can use
-    for your proxy or tiny. 
-    usage: ./free-port.sh
+
+프록시 또는 타이니 서버에서 사용할 수 있는 사용되지 않는 TCP 포트를 찾아주는 유용한 스크립트입니다.
+
+사용법: ./free-port.sh
 
 driver.sh
-    The autograder for Basic, Concurrency, and Cache.        
-    usage: ./driver.sh
+
+기본, 동시성 및 캐시 과목의 자동 채점 프로그램입니다.
+
+사용법: ./driver.sh
 
 nop-server.py
-     helper for the autograder.         
+
+자동 채점기 도우미
 
 tiny
-    Tiny Web server from the CS:APP text
-
+CS:APP 교재에 나오는 Tiny 웹 서버
