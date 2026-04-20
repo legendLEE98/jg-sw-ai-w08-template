@@ -12,9 +12,13 @@ void clienterror(int fd, char *cause, char *errnum, char *shortmsg, char *longms
 // 포트 열고 대기
 // 연결 요청 시 doit 함수 호출
 int main(int argc, char **argv) {
+    // 요청 변수 / 커넥션 변수 선언
     int listenfd, connfd;
+    // http://hostname:port
     char hostname[MAXLINE], port[MAXLINE];
+    // socklen_t 소켓 길이
     socklen_t clientlen;
+    // 클라이언트 접속 경로
     struct sockaddr_storage clientaddr;
 
     // 잘못 입력 시
@@ -23,15 +27,23 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
+    // 서버 열고 listenfd에 대기. 포트는 argv 1로 받은 포트번호
     listenfd = Open_listenfd(argv[1]);
-    while (1) {
+    while (1) { // 반복
+        // clientaddr 정의
         clientlen = sizeof(clientaddr);
+        // Accept로 connfd에 데이터 전송
+
+        // 실제 연결 대기 (os가 채워줄 때 까지 대기함.)
         connfd = Accept(listenfd, (SA *)&clientaddr, &clientlen);
         // Getnameinfo((SA *) &clientaddr, clientlen, hostname, MAXLINE, port, MAXLINE, 0); //원본 코드
+        // getnameinfo
+        // clientaddr 확인해서 clientlen, hostname, port 채움
         if (getnameinfo((SA *) &clientaddr, clientlen, hostname, MAXLINE, port, MAXLINE, 0) != 0) {
             strcpy(hostname, "unknown");
             strcpy(port, "unknown");
         }
+        // getnameinfo로 채운 hostname, port 반환
         printf("Accepted connection from (%s, %s)\n", hostname, port);
         doit(connfd);
         Close(connfd);
@@ -42,35 +54,54 @@ int main(int argc, char **argv) {
 // GET 요청 확인 후 URI 파싱, 파일 존재 확인
 // static, dynamic 분기
 void doit(int fd) {
+    // 정적 페이지인지 체크하는 변순듯?
     int is_static;
+    // 장치 id, inode, chmod 및 chown, 수정 시간 등 정보를 담는 구조체
     struct stat sbuf;
+    // buf는 임시보관용 string
     char buf[MAXLINE], method[MAXLINE], uri[MAXLINE], version[MAXLINE];
+    // 파일이름 및 경로 / dynamic일 경우, adder의 x값 y값 대입받는 변수
     char filename[MAXLINE], cgiargs[MAXLINE];
+    // 입력값 바이트단위가 아닌 줄단위로 읽으려고 선언
     rio_t rio;
 
+    // rio 초기화 및 fd값에 4할당
     Rio_readinitb(&rio, fd);
+    
+    // &rio의 값을 읽고 buf에 값을 할당함. MAXLINE만큼
+    // 더 길면 자름. 에러코드 반환하는게 좋긴 함.
     Rio_readlineb(&rio, buf, MAXLINE);
     printf("Request headers:\n");
+    // buf에 GET / HTTP/1.1 입력돼있음.
     printf("%s", buf);
+
+    // method, uri, version에 값 입력
     sscanf(buf, "%s %s %s", method, uri, version);
 
+    // strcasecmp - 대소문자 구분 없이
+    // method가 "get"이면 0 반환. 그 외의 경우엔 모두 true니까 실행
     if (strcasecmp(method, "GET")) {
         clienterror(fd, method, "501", "Not implemented", "Tiny dose not implement this method");
         return;
     }
+    // 빈 줄 나올 때 까지 읽는 함수
     read_requesthdrs(&rio);
 
+    // 여기에서 값 채워줌
     is_static = parse_uri(uri, filename, cgiargs);
+    // stat(filename, &sbuf이 0이 아닐 때)
     if (stat(filename, &sbuf) < 0) {
         clienterror(fd, filename, "404", "Not found", "Tiny couldn't find this file");
         return;
     }
 
+    // is_static 값이 1일 때,
     if (is_static) {
         if(!(S_ISREG(sbuf.st_mode)) || !(S_IRUSR & sbuf.st_mode)) {
             clienterror(fd, filename, "403", "Forbidden", "Tiny couldn't read the file");
             return;
         }
+        // 
         serve_static(fd, filename, sbuf.st_size);
     }
     else {
@@ -113,13 +144,18 @@ void read_requesthdrs(rio_t *rp) {
 }
 
 // URI 확인 후 static dynamic 판단
+// 여기에서 보낼 경로 파악함
 int parse_uri(char *uri, char *filename, char *cgiargs) {
     char *ptr;
 
+    // cgi-bin이 아닐 때
     if (!strstr(uri, "cgi-bin")) {
+        // 문자열 복사함수 strcpy
         strcpy(cgiargs, "");
         strcpy(filename, ".");
         strcat(filename, uri);
+        
+        // 여기에서 home.html 채워줌
         if (uri[strlen(uri)-1] == '/')
             strcat(filename, "home.html");
         return 1;
