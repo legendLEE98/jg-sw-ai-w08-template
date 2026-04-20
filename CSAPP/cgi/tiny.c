@@ -8,13 +8,16 @@ void get_filetype(char *filename, char *filetype);
 void serve_dynamic(int fd, char *filename, char *cgiargs);
 void clienterror(int fd, char *cause, char *errnum, char *shortmsg, char *longmsg);
 
+
+// 포트 열고 대기
+// 연결 요청 시 doit 함수 호출
 int main(int argc, char **argv) {
     int listenfd, connfd;
     char hostname[MAXLINE], port[MAXLINE];
     socklen_t clientlen;
     struct sockaddr_storage clientaddr;
 
-    // 입력 잘못한거
+    // 잘못 입력 시
     if (argc != 2) {
         fprintf(stderr, "usage: %s <port>\n", argv[0]);
         exit(1);
@@ -35,6 +38,9 @@ int main(int argc, char **argv) {
     }
 }
 
+// 클라이언트 작업 요청 처리
+// GET 요청 확인 후 URI 파싱, 파일 존재 확인
+// static, dynamic 분기
 void doit(int fd) {
     int is_static;
     struct stat sbuf;
@@ -76,6 +82,7 @@ void doit(int fd) {
     }
 }
 
+// 에러 호출
 void clienterror(int fd, char *cause, char *errnum, char *shortmsg, char *longmsg) {
     char buf[MAXLINE], body[MAXLINE];
     sprintf(body, "<html><title>Tiny Error</title>");
@@ -93,6 +100,7 @@ void clienterror(int fd, char *cause, char *errnum, char *shortmsg, char *longms
     Rio_writen(fd, body, strlen(body));
 }
 
+// HTTP 요청을 \r\n 나올 때 까지 읽은 후 출력
 void read_requesthdrs(rio_t *rp) {
     char buf[MAXLINE];
 
@@ -104,6 +112,7 @@ void read_requesthdrs(rio_t *rp) {
     return;
 }
 
+// URI 확인 후 static dynamic 판단
 int parse_uri(char *uri, char *filename, char *cgiargs) {
     char *ptr;
 
@@ -130,6 +139,7 @@ int parse_uri(char *uri, char *filename, char *cgiargs) {
     }
 }
 
+// 파일 mmap으로 메모리에 올려서 http 응답 헤더 + 파일 내용 전송
 void serve_static(int fd, char *filename, int filesize) {
     int srcfd;
     char *srcp, filetype[MAXLINE], buf[MAXLINE];
@@ -151,6 +161,7 @@ void serve_static(int fd, char *filename, int filesize) {
     Munmap(srcp, filesize);
 }
 
+// 확장자 확인 후 Content-type 결정
 void get_filetype(char *filename, char *filetype) {
     if (strstr(filename, ".html"))
         strcpy(filetype, "text/html");
@@ -164,6 +175,10 @@ void get_filetype(char *filename, char *filetype) {
         strcpy(filetype, "text/plain");
 }
 
+// 자식 프로세스 fork
+// QUERY_STRING 환경 변수 설정
+// stdout을 소켓으로 리다이렉트
+// CGI 프로그램 execve, 부모는 wait
 void serve_dynamic(int fd, char *filename, char *cgiargs) {
     char buf[MAXLINE], *emptylist[] = { NULL };
     sprintf(buf, "HTTP/1.0 200 OK\r\n");
