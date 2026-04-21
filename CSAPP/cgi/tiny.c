@@ -98,6 +98,7 @@ void doit(int fd) {
         echo_static(fd, bbuf);
         return;
     }
+
     // stat(filename, &sbuf이 0이 아닐 때)
     if (stat(filename, &sbuf) < 0) {
         clienterror(fd, filename, "404", "Not found", "Tiny couldn't find this file");
@@ -213,9 +214,9 @@ void serve_static(int fd, char *filename, int filesize, char *version, char *met
         return;
     }
 
-
     srcfd = Open(filename, O_RDONLY, 0);
     // 아래는 기존 코드
+
     // srcp = Mmap(0, filesize, PROT_READ, MAP_PRIVATE, srcfd, 0);
     // Close(srcfd);
     // Rio_writen(fd, srcp, filesize);
