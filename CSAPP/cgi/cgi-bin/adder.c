@@ -9,8 +9,8 @@ int main(void) {
     if ((buf = getenv("QUERY_STRING")) != NULL) {
         p = strchr(buf, '&');
         *p = '\0';
-        sscanf(buf, "first=%d", &n1);
-        sscanf(p + 1, "second=%d", &n2);
+        sscanf(buf, "num1=%d", &n1);
+        sscanf(p + 1, "num2=%d", &n2);
     }
 
     /* Make the response body */
