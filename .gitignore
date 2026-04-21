@@ -4,6 +4,10 @@
 .LSOverride
 ._*
 
+# video
+*.mp4
+*.mpg
+*.mpeg
 
 .devcontainer
 
