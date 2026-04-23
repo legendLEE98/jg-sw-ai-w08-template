@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
         // Accept로 connfd에 데이터 전송
 
         // 실제 연결 대기 (os가 채워줄 때 까지 대기함.)
-        connfd = Accept(listenfd, (SA *)&clientaddr, &clientlen);
+        connfd = Accept(listenfd, (SA *)&clientaddr, &clientlen);   
         // Getnameinfo((SA *) &clientaddr, clientlen, hostname, MAXLINE, port, MAXLINE, 0); //원본 코드
         // getnameinfo
         // clientaddr 확인해서 clientlen, hostname, port 채움
